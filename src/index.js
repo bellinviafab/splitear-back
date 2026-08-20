@@ -1,12 +1,19 @@
 require('dotenv').config();
 const app = require('./app');
 const db = require('./db');
-const PORT = process.env.PORT || 3000; //Crear .env
+const User = require('./models/User');
+const PORT = process.env.PORT; //Pasar al .env
 
 
-db.sync().then(() => {
-    app.listen(PORT)
-})
+db.sync({ force: false }) //Cambiar a false
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log(`Servidor escuchando en el puerto ${PORT} y DB conectada`)
+        })
+    })
+    .catch((error) => {
+        console.error('El error al sincronizar la bd fue: ', error)
+    })
 
 
 
