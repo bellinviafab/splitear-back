@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken")
 
 const crearUsuario = async (req, res) => {
     try {
@@ -16,21 +17,52 @@ const crearUsuario = async (req, res) => {
 }
 
 const loginUsuario = async (req, res) => {
-    const { username, password } = req.body;
-    const user = await User.findOne({ where: { username: username } })
-    if (!user)  //Usuario y/o contraseña incorrecto
-        return res.send(401);
-    const validar = await user.validarPassword(password);
-    if (!validar)   //Usuario y/o contraseña incorrectos
-        return res.send(401)
+    try {
+        const { username, password } = req.body;
+        const user = await User.findOne({ where: { username: username } }) //Operacion de I/O, sale del stack
+        if (!user)  //Salida -> "Usuario y/o contraseña incorrecto"
+            return res.send(401);
+        const validar = await user.validarPassword(password);
+        if (!validar)   //salida -> "Usuario y/o contraseña incorrectos"
+            return res.send(401)
+        const payload = {  //Payload para el jwt
+            id: user.id,
+            username: user.username
+        }
+        const token = generarToken(payload)
 
-    return res.send(200); //login exitoso
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 2 * 60 * 60 * 1000,
+        });
+        return res.status(200).json({
+            message: "Login exitoso",
+            user: {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+            },
+            token,
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            error: error.name,
+            message: error.message,
+        });
+    }
 }
 
+function generarToken(payload) {
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "2h" }); //Secret es constante
+    console.log("El token para fabri es: ", token)
+    return token;
+}
 
-
-const logoutUsuario = async (req, res) => {
-
+const logoutUsuario = (req, res) => {
+    res.clearCookie("token");
+    return res.sendStatus(204);
 }
 
 module.exports = { crearUsuario, loginUsuario, logoutUsuario }

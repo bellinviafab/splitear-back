@@ -2,11 +2,11 @@ const S = require('sequelize')
 const db = require('../db')
 const bcrypt = require("bcrypt")
 
-class User extends S.Model {
+class User extends S.Model { //Declara clase user y hereda modelo de sequelize
     async validarPassword(password) {
         return await bcrypt.hash(password, this.salt) === this.password;
     }
-} //Declara clase user y hereda modelo de sequelize
+}
 
 User.init({
     username: {
@@ -58,5 +58,6 @@ User.beforeCreate(async (user) => {  //beforeCreate es un hook a nivel capa de a
         throw error;
     }
 })
+
 
 module.exports = User
