@@ -36,7 +36,6 @@ const crearGrupo = async (req, res) => {
         await t.commit();
         return res.status(201).json(newGrupo);
     } catch (error) {
-        console.error("El error es:", error);
         await t.rollback();
         return res.sendStatus(500);
     }
@@ -47,16 +46,66 @@ async function enviarMail() {
     //Invitacion por mail
 }
 
-/*  
-    El user ya esta validado por el validateCookie
-    Verificar nombre de grupo
-        No debe coincidir con alguno de los ya existentes creados por el usuario
-    Crear Grupo y extraer id
-    Asignar al grupo la fk al userCreador
-    Obtener en un arreglo los participantes
-    Buscarlos en la bd
-        Si se encuentran, vincularlos al grupo
-        Si no se encuentran porque no crearon cuenta aún, enviarles un mail de invitación
-*/
+const eliminarGrupo = async (req, res) => {  //Soft delete
+    try {
+        const idUser = req.user.id;
+        const idGrupo = req.params.id;
+        const grupo = await Grupo.findOne({ where: { id: idGrupo, creadorId: idUser } }) //Busqueda por id y por fk al creador
+        if (!grupo)
+            return res.sendStatus(404); //Grupo no encontrado
+        await grupo.destroy();
+        return res.status(200).json({ mensaje: "Grupo eliminado exitosamente" }); //Grupo soft-deleted
+    } catch (error) {
+        return res.sendStatus(500);
+    }
 
-module.exports = { crearGrupo };
+}
+
+const agregarMiembro = async (req, res) => {
+    try {
+        const { integrante = {} } = req.body;
+        const grupo = await Grupo.findOne({ where: { id: req.params.id, creadorId: req.user.id } })
+        if (!grupo)
+            return res.status(404).json({ mensaje: "Grupo no encontrado y/o Usuario no autorizado" });
+
+        const newIntegrante = await User.findOne({ where: { email: integrante.email } })
+
+        if (!newIntegrante) {
+            enviarMail(integrante.email, grupo);
+            return res.status(200).json({ mensaje: "El usuario no posee cuenta, se ha enviado un email de invitación" })
+        }
+
+        if (await grupo.hasUser(newIntegrante))
+            return res.status(400).json({ mensaje: "Usuario ya forma parte del grupo" })
+
+        await grupo.addUser(newIntegrante);
+        return res.status(200).json({ mensaje: "Usuario añadido con exito" })
+    } catch (error) {
+        console.error(error);
+        return res.sendStatus(500);
+    }
+}
+
+const eliminarMiembro = async (req, res) => {
+    try {
+        const grupo = await Grupo.findOne({ where: { id: req.params.id, creadorId: req.user.id } })
+        const miembroElim = Number(req.params.userId) //Express parsea params como string
+        if (!grupo) //Grupo inexistente o usuario no tiene permisos por no ser el creador
+            return res.status(404).json({ mensaje: "Grupo no encontrado y/o Usuario no autorizado" })
+
+        if (miembroElim == req.user.id)
+            return res.status(400).json({ mensaje: "El administrador no puede eliminarse" })
+
+        if (!(await grupo.hasUser(miembroElim)))
+            return res.status(400).json({ mensaje: "Usuario no pertenece al grupo" })
+
+        await grupo.removeUser(miembroElim)
+        return res.status(200).json({ mensaje: "Miembro eliminado con exito" })
+    } catch (error) {
+        console.error(error)
+        return res.sendStatus(500)
+    }
+}
+
+
+module.exports = { crearGrupo, eliminarGrupo, agregarMiembro, eliminarMiembro };

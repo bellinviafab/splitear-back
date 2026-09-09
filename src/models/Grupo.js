@@ -11,7 +11,7 @@ Grupo.init({
     fechaFin: {
         type: S.DATE,
         allowNull: true,
-    }
-}, { sequelize: db, modelName: 'grupo' })
+    },
+}, { sequelize: db, modelName: 'grupo', paranoid: true })//A partir de un destroy, cualquier consulta que se le haga es ignorada si paranoid:true
 
 module.exports = Grupo;

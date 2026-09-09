@@ -5,7 +5,9 @@ const grupoController = require("../controllers/grupos.controller.js")
 const authMiddleware = require("../middlewares/auth.middlwares.js")
 
 router.post('/', authMiddleware.validateCookie, grupoController.crearGrupo); //Verificar roles
-
+router.post('/:id/miembros', authMiddleware.validateCookie, grupoController.agregarMiembro);
+router.delete('/:id', authMiddleware.validateCookie, grupoController.eliminarGrupo);
+router.delete('/:id/miembros/:userId', authMiddleware.validateCookie, grupoController.eliminarMiembro);
 
 
 module.exports = router;
