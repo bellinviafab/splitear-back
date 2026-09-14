@@ -3,7 +3,7 @@ const app = express();
 const authRoutes = require('./routes/auth.routes.js');
 const cookieParser = require('cookie-parser');
 const grupoRoutes = require("./routes/grupos.routes.js");
-const gastoRoutes = require("./routes/grupos.routes.js")
+const gastoRoutes = require("./routes/gastos.routes.js")
 
 app.use(express.json());
 app.use(cookieParser());

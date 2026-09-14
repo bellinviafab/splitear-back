@@ -1,5 +1,5 @@
 const Gasto = require("../models/Gasto")
-const Grupo = require("../models/Gasto")
+const Grupo = require("../models/Grupo")
 const Pertenencia = require("../models/Pertenencia")
 const User = require("../models/User")
 const { Op } = require("sequelize")
@@ -28,15 +28,15 @@ const crearGasto = async (req, res) => {
         const { participantes = [] } = req.body;
         const arrayParticipantes = [];
         arrayParticipantes.push(user)
-
-        for (let participante of participantes) {
-            const newParticipante = await Pertenencia.findOne({ where: { integranteId: participante.id, grupodId: grupo.id } }) //Que sucede con los que dan null?
+        console.log("aca")
+        for (let participante of participantes) {   //Cambiar consulta para evitar N+1
+            const newParticipante = await Pertenencia.findOne({ where: { integranteId: participante.id, grupoId: grupo.id } }) //Que sucede con los que dan null?
             if (!newParticipante)
-                return res.status(400)
+                return res.status(400).json({ mensaje: `El participante con ID ${participante.id} no pertenece al grupo` })
             else
                 arrayParticipantes.push(participante)
         }
-
+        console.log("aca")
         const nuevoGasto = await gastoService.procesarYCrearGasto(grupo.id, arrayParticipantes, monto, user.id, descripcion)
         return res.status(201).json(nuevoGasto);
     } catch (error) {

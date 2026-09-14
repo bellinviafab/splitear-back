@@ -64,7 +64,6 @@ const loginUsuario = async (req, res) => {
 
 function generarToken(payload) {
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "2h" }); //Secret es constante
-    console.log("El token para fabri es: ", token)
     return token;
 }
 

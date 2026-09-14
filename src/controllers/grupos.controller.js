@@ -22,14 +22,14 @@ const crearGrupo = async (req, res) => {
         const { integrantes = [] } = req.body;
         const arrayIntegrantes = [];
 
-        for (let integrante of integrantes) {
+        for (let integrante of integrantes) {  //Arreglar consulta para evitar N+1
             const newIntegrante = await User.findOne({ where: { email: integrante.email }, transaction: t })
             if (!newIntegrante)
                 enviarMail(integrante.email, newGrupo.nombreGrupo);
             else
                 arrayIntegrantes.push(newIntegrante);
         }
-        //const usuarioCreador = await User.findByPk(user.id, { transaction: t }) //Añadir al administrador como integrante del grupo.
+
         arrayIntegrantes.push(user.id);
         await newGrupo.addUsers(arrayIntegrantes, { transaction: t });
 
