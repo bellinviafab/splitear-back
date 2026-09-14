@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
+const { Op } = require("sequelize")
 
 const crearUsuario = async (req, res) => {
     try {
@@ -18,8 +19,15 @@ const crearUsuario = async (req, res) => {
 
 const loginUsuario = async (req, res) => {
     try {
-        const { username, password } = req.body;
-        const user = await User.findOne({ where: { username: username } }) //Operacion de I/O, sale del stack
+        const { identificador, password } = req.body;
+
+        const user = await User.findOne({//Operacion de I/O, sale del stack
+            where: {
+                [Op.or]: [
+                    { username: identificador }, { email: identificador }
+                ],
+            },
+        })
         if (!user)  //Salida -> "Usuario y/o contraseña incorrecto"
             return res.send(401);
         const validar = await user.validarPassword(password);

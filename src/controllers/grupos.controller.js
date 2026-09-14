@@ -86,7 +86,7 @@ const agregarMiembro = async (req, res) => {
     }
 }
 
-const eliminarMiembro = async (req, res) => {
+const eliminarMiembro = async (req, res) => { //Soft delete
     try {
         const grupo = await Grupo.findOne({ where: { id: req.params.id, creadorId: req.user.id } })
         const miembroElim = Number(req.params.userId) //Express parsea params como string

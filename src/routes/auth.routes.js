@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User')
 const authController = require('../controllers/auth.controller')
-const authMiddleware = require('../middlewares/auth.middlwares')
+const authMiddleware = require('../middlewares/auth.middlewares')
 
 
 /*router.get('/register', (req, res) => {
