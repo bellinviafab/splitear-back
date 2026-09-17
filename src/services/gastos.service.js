@@ -35,18 +35,6 @@ async function procesarYCrearGasto(idGrupo, arrayParticipantes, monto, idPagador
 
 module.exports = { procesarYCrearGasto };
 
-/*
-Crear el gasto con fk a pagador
-    -fk a pagador
-    -fk a idgrupo
-    -monto
-    -descripcion
-Dividir el monto total entre los participantes (incluye al pagador)
-Crear una transaccion que inserte en detalle_gasto
-    -fk a idGasto
-    -fk a idParticipante
-    -Monto correspondiente
 
-*/
 
 

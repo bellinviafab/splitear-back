@@ -24,6 +24,7 @@ Detalle_gasto.init({
             fields: ['idGasto', 'idParticipante']
         }
     ]
+    , paranoid: true
 })
 
 module.exports = Detalle_gasto;

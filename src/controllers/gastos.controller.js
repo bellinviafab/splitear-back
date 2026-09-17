@@ -1,9 +1,11 @@
 const Gasto = require("../models/Gasto")
 const Grupo = require("../models/Grupo")
 const Pertenencia = require("../models/Pertenencia")
+const Detalle_gasto = require("../models/Detalle_gasto")
 const User = require("../models/User")
 const { Op } = require("sequelize")
 const gastoService = require("../services/gastos.service")
+const s = require('../db.js')
 
 const crearGasto = async (req, res) => {
     try {
@@ -28,7 +30,6 @@ const crearGasto = async (req, res) => {
         const { participantes = [] } = req.body;
         const arrayParticipantes = [];
         arrayParticipantes.push(user)
-        console.log("aca")
         for (let participante of participantes) {   //Cambiar consulta para evitar N+1
             const newParticipante = await Pertenencia.findOne({ where: { integranteId: participante.id, grupoId: grupo.id } }) //Que sucede con los que dan null?
             if (!newParticipante)
@@ -36,7 +37,6 @@ const crearGasto = async (req, res) => {
             else
                 arrayParticipantes.push(participante)
         }
-        console.log("aca")
         const nuevoGasto = await gastoService.procesarYCrearGasto(grupo.id, arrayParticipantes, monto, user.id, descripcion)
         return res.status(201).json(nuevoGasto);
     } catch (error) {
@@ -44,20 +44,46 @@ const crearGasto = async (req, res) => {
     }
 }
 
+const eliminarGasto = async (req, res) => {
+    try {
+        const user = req.user;
+        const idGrupo = req.params.id;
+        const idGasto = req.params.idGasto;
 
+        const grupo = await Grupo.findByPk(idGrupo)
+        if (!grupo)
+            return res.status(404).json({ mensaje: "Grupo inexistente" })
 
-/*
-Traer al user desde req.user
-Traer al grupo
-Validar el grupo
-validar que forme parte del grupo
-Validar a los usuarios que forman parte del gasto
-    Validar que formen parte del grupo
+        const userPertenece = await Pertenencia.findOne({ where: { integranteId: user.id, grupoId: idGrupo } })
+        if (!userPertenece)
+            return res.status(403).json({ mensaje: "Usuario inexistente y/o no pertenece al grupo" })
 
-Crear Gasto general
-Crear Detalle de gasto
+        const gasto = await Gasto.findOne({ where: { id: idGasto, idGrupo: idGrupo } }) //Dado que Gasto tiene paranoid:true, una segunda consulta retorna 404
+        if (!gasto)
+            return res.status(404).json({ mensaje: "Gasto no se encuentra y/o no existe en el grupo" })
 
-*/
+        if (gasto.idCreadorGasto !== user.id && grupo.creadorId !== user.id) //Solo elimina el que creó el gasto o el admin del grupo
+            return res.status(403).json({ mensaje: "No tenes permisos para eliminar un gasto que no creaste" })
 
+        const t = await s.transaction();    //Transaccion limitada a las operaciones necesarias
+        try {
+            await Detalle_gasto.destroy({ where: { idGasto: gasto.id }, transaction: t });
+            await gasto.destroy({ transaction: t }) //Soft-delete en ambos
 
-module.exports = { crearGasto };
+            await t.commit();
+            return res.status(200).json({ mensaje: "Gasto eliminado con exito" })
+        } catch (error) {
+            await t.rollback();
+            throw error;
+        }
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+
+}
+
+const liquidarDeudas = async (req, res) => {
+
+}
+
+module.exports = { crearGasto, eliminarGasto };

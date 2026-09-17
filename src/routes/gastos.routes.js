@@ -4,6 +4,7 @@ const authMiddleware = require("../middlewares/auth.middlewares.js")
 const gastosController = require("../controllers/gastos.controller.js");
 
 router.post('/:id', authMiddleware.validateCookie, gastosController.crearGasto);
+router.delete('/:id/:idGasto', authMiddleware.validateCookie, gastosController.eliminarGasto);
 
 
 

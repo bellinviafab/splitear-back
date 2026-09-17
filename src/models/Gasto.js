@@ -22,6 +22,6 @@ Gasto.init({
         type: S.INTEGER,
         allowNull: false
     }
-}, { sequelize: db, modelName: "gasto" });
+}, { sequelize: db, modelName: "gasto", paranoid: true });
 
 module.exports = Gasto;
