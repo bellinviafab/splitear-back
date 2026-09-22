@@ -29,7 +29,7 @@ const crearGasto = async (req, res) => {
 
         const { participantes = [] } = req.body;
         const arrayParticipantes = [];
-        arrayParticipantes.push(user)
+        //arrayParticipantes.push(user) Solo ingresan al arreglo los seleccionados desde el front
         for (let participante of participantes) {   //Cambiar consulta para evitar N+1
             const newParticipante = await Pertenencia.findOne({ where: { integranteId: participante.id, grupoId: grupo.id } }) //Que sucede con los que dan null?
             if (!newParticipante)
@@ -82,8 +82,14 @@ const eliminarGasto = async (req, res) => {
 
 }
 
-const liquidarDeudas = async (req, res) => {
-
+const liquidarDeuda = async (req, res) => {
+    try {
+        const obtieneLiquidacion = await gastoService.obtenerLiquidacion(req.params.id)  //Se va con el idGrupo
+        return res.status(200).json(obtieneLiquidacion);
+    } catch (error) {
+        return res.status(500).json(error);
+    }
 }
 
-module.exports = { crearGasto, eliminarGasto };
+
+module.exports = { crearGasto, eliminarGasto, liquidarDeuda };

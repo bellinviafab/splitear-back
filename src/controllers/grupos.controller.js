@@ -23,11 +23,11 @@ const crearGrupo = async (req, res) => {
         const arrayIntegrantes = [];
 
         for (let integrante of integrantes) {  //Arreglar consulta para evitar N+1
-            const newIntegrante = await User.findOne({ where: { email: integrante.email }, transaction: t })
+            const newIntegrante = await User.findOne({ where: { email: integrante }, transaction: t })
             if (!newIntegrante)
                 enviarMail(integrante.email, newGrupo.nombreGrupo);
             else
-                arrayIntegrantes.push(newIntegrante);
+                arrayIntegrantes.push(newIntegrante.id);
         }
 
         arrayIntegrantes.push(user.id);
@@ -42,7 +42,7 @@ const crearGrupo = async (req, res) => {
 
 }
 
-async function enviarMail() {
+async function enviarMail() { //Puertos diferentes
     //Invitacion por mail
 }
 

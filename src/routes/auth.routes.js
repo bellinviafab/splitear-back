@@ -13,8 +13,4 @@ router.post('/register', authController.crearUsuario);
 router.post('/login', authController.loginUsuario);
 router.post('/logout', authController.logoutUsuario);
 
-router.get("/me", authMiddleware.validateCookie, (req, res) => {
-    return res.status(200).json({ user: req.user });
-});
-
 module.exports = router;

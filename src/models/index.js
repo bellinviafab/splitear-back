@@ -13,5 +13,6 @@ User.belongsToMany(Gasto, { through: Detalle_gasto, foreignKey: 'idParticipante'
 Gasto.belongsToMany(User, { through: Detalle_gasto, foreignKey: 'idGasto', otherKey: 'idParticipante', as: 'participantes' })
 Detalle_gasto.belongsTo(Gasto, { as: 'gasto', foreignKey: 'idGasto' });
 Detalle_gasto.belongsTo(User, { as: 'participante', foreignKey: 'idParticipante' })  //Permite consultas directas
+Gasto.hasMany(Detalle_gasto, { foreignKey: 'idGasto' })
 
 module.exports = { Grupo, User, Gasto, Detalle_gasto };
