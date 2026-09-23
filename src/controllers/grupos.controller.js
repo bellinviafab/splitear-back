@@ -2,6 +2,7 @@ const Grupo = require("../models/Grupo.js");
 const Pertenencia = require("../models/Pertenencia.js");
 const User = require("../models/User.js");
 const s = require('../db.js')
+const grupoService = require("../services/grupos.service.js")
 
 
 const crearGrupo = async (req, res) => {
@@ -107,5 +108,13 @@ const eliminarMiembro = async (req, res) => { //Soft delete
     }
 }
 
+const getGrupos = async (req, res) => {
+    try {
+        const listaGrupos = await grupoService.getGrupos(req.user.id)
+        return res.status(200).json(listaGrupos)
+    } catch (error) {
+        return res.status(500).json({ error: "Ocurrió un error al buscar al tus grupos" })
+    }
+}
 
-module.exports = { crearGrupo, eliminarGrupo, agregarMiembro, eliminarMiembro };
+module.exports = { crearGrupo, eliminarGrupo, agregarMiembro, eliminarMiembro, getGrupos };
