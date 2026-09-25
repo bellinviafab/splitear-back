@@ -149,6 +149,20 @@ async function obtenerListaSaldoNeto(listaParticipantes, gastoTotalIntegrante, p
     return arregloSaldoNeto;
 }
 
+/*const getGastosGrupo = async (idGrupo) => {
+    return Grupo.findOne({
+        where: {
+            id: idGrupo
+        },
+
+        attributes: ['id', sequelize.fn('SUM', sequelize.col('grupo.monto')), 'totalGastado'],
+
+        group: [
+            'id'
+        ]
+
+    })
+}*/
 
 
 
@@ -156,7 +170,7 @@ async function obtenerListaSaldoNeto(listaParticipantes, gastoTotalIntegrante, p
 
 
 
-module.exports = { procesarYCrearGasto, obtenerLiquidacion };
+module.exports = { procesarYCrearGasto, obtenerLiquidacion, obtenerGastoTotalIntegrante };
 
 
 

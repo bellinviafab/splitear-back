@@ -1,5 +1,6 @@
 const Grupo = require("../models/Grupo")
 const User = require("../models/User")
+const gastosService = require("./gastos.service")
 
 const getGrupos = async (idUser) => {
     const listaGrupos = await Grupo.findAll({
@@ -15,4 +16,35 @@ const getGrupos = async (idUser) => {
     return listaGrupos
 }
 
-module.exports = { getGrupos }
+const getGrupo = async (idGrupo) => {
+    return await Grupo.findByPk(idGrupo, {
+        attributes: ['id', 'nombreGrupo', 'fechaFin', 'image']
+    })
+}
+
+const getDetalleGrupo = async (idGrupo) => {
+    const grupo = await getGrupo(idGrupo);  //Se debe validar primero el grupo
+    if (!grupo)  //fail fast
+        return null
+
+    const integrantes = await User.findAll({
+        attributes: ['id', 'name', 'last_name', 'alias', 'image'],
+
+        include: [{
+            model: Grupo,
+            where: { id: idGrupo },
+            attributes: [],
+            through: { attributes: [] }
+        }]
+    })
+
+    const gastosMap = await gastosService.obtenerGastoTotalIntegrante(idGrupo);
+    const gastosPorIntegrante = Object.fromEntries(gastosMap) //Se debe pasar a un arreglo de objetos. El front no puede deserializar un map desde un json
+
+    let sumaTotal = 0
+    for (const monto of gastosMap.values()) { sumaTotal += monto }
+    const gastoTotalGrupo = sumaTotal
+    return { grupo, integrantes, gastosPorIntegrante, gastoTotalGrupo }
+}
+
+module.exports = { getGrupos, getDetalleGrupo }

@@ -9,6 +9,7 @@ router.post('/:id/miembros', authMiddleware.validateCookie, grupoController.agre
 router.delete('/:id', authMiddleware.validateCookie, grupoController.eliminarGrupo);
 router.delete('/:id/miembros/:userId', authMiddleware.validateCookie, grupoController.eliminarMiembro);
 router.get('/', authMiddleware.validateCookie, grupoController.getGrupos)
+router.get('/:id', authMiddleware.validateCookie, grupoController.detalleGrupo);
 
 
 module.exports = router;

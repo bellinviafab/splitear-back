@@ -108,7 +108,7 @@ const eliminarMiembro = async (req, res) => { //Soft delete
     }
 }
 
-const getGrupos = async (req, res) => {
+const getGrupos = async (req, res) => { //Grupos referidos a un usuario
     try {
         const listaGrupos = await grupoService.getGrupos(req.user.id)
         return res.status(200).json(listaGrupos)
@@ -117,4 +117,17 @@ const getGrupos = async (req, res) => {
     }
 }
 
-module.exports = { crearGrupo, eliminarGrupo, agregarMiembro, eliminarMiembro, getGrupos };
+const detalleGrupo = async (req, res) => {
+    try {
+        const detalleGrupo = await grupoService.getDetalleGrupo(req.params.id)
+        if (!detalleGrupo) {
+            return res.status(404).json({ error: "El grupo solicitado no existe" });
+        }
+        return res.status(200).json(detalleGrupo)
+    } catch (error) {
+        console.log("Error real en getDetalleGrupo:", error);
+        return res.status(500).json({ error: "Ocurrió un error al mostrar el detalle del Grupo" })
+    }
+}
+
+module.exports = { crearGrupo, eliminarGrupo, agregarMiembro, eliminarMiembro, getGrupos, detalleGrupo };
