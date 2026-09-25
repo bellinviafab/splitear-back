@@ -125,9 +125,18 @@ const detalleGrupo = async (req, res) => {
         }
         return res.status(200).json(detalleGrupo)
     } catch (error) {
-        console.log("Error real en getDetalleGrupo:", error);
         return res.status(500).json({ error: "Ocurrió un error al mostrar el detalle del Grupo" })
     }
 }
 
-module.exports = { crearGrupo, eliminarGrupo, agregarMiembro, eliminarMiembro, getGrupos, detalleGrupo };
+const listadoGastosGrupo = async (req, res) => {
+    try {
+        const listado = await grupoService.obtenerListadoGastosGrupo(req.params.id)
+        return res.status(200).json(listado)
+    } catch (error) {
+        console.error(error)
+        return res.status(500).json({ error: "Ocurrió un error al obtener el listado de gastos" })
+    }
+}
+
+module.exports = { crearGrupo, eliminarGrupo, agregarMiembro, eliminarMiembro, getGrupos, detalleGrupo, listadoGastosGrupo };

@@ -2,6 +2,7 @@ const Gasto = require("../models/Gasto")
 const Detalle_gasto = require("../models/Detalle_gasto.js")
 const Pertenencia = require("../models/Pertenencia.js")
 const Grupo = require("../models/Grupo.js")
+const User = require("../models/User.js")
 const s = require('../db.js')
 const sequelize = require("sequelize")
 
@@ -43,7 +44,7 @@ const obtenerLiquidacion = async (idGrupo) => {  //Recorrer arreglos con find de
         if (!grupo) {
             const error = new Error("Grupo inexistente")
             error.status = 404
-            throw error;
+            return error;       //Validar
         }
         const listaParticipantes = await Pertenencia.findAll({  //Se debe comenzar con un findAll ya que puede haber participantes que nunca aportaron y son deudores totales
             where: {
@@ -76,7 +77,6 @@ const obtenerLiquidacion = async (idGrupo) => {  //Recorrer arreglos con find de
 
         return listadoDeudas;
     } catch (error) {
-        console.error(error)
         throw error;
     }
 
@@ -150,6 +150,22 @@ async function obtenerListaSaldoNeto(listaParticipantes, gastoTotalIntegrante, p
     return arregloSaldoNeto;
 }
 
+async function obtenerGastosGrupo(idGrupo) {
+    return await Gasto.findAll({
+        attributes: ['id', 'monto', 'descripcion', 'idCreadorGasto', 'createdAt'],
+        where: { idGrupo: idGrupo },
+
+        include: [
+            {
+                model: User,
+                as: 'creador',
+                attributes: ['id', 'name', 'alias']
+            }
+        ],
+        order: [['createdAt', 'DESC']]
+    });
+}
+
 /*const getGastosGrupo = async (idGrupo) => {
     return Grupo.findOne({
         where: {
@@ -171,7 +187,7 @@ async function obtenerListaSaldoNeto(listaParticipantes, gastoTotalIntegrante, p
 
 
 
-module.exports = { procesarYCrearGasto, obtenerLiquidacion, obtenerGastoTotalIntegrante };
+module.exports = { procesarYCrearGasto, obtenerLiquidacion, obtenerGastoTotalIntegrante, obtenerGastosGrupo };
 
 
 

@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken")
 const authService = require("../services/auths.service")
-const grupoService = require("../models/Grupo")
+const grupoService = require("../services/grupos.service")
 
 const validateCookie = (req, res, next) => {
     try {
@@ -29,7 +29,6 @@ const validaPertenencia = async (req, res, next) => {
 
         next();
     } catch (error) {
-        console.error(error)
         return res.status(500).json({ error: "Error al validar la pertenencia al grupo" });
     }
 }

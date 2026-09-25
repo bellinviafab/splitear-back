@@ -47,11 +47,17 @@ const getDetalleGrupo = async (idGrupo) => {
     return { grupo, integrantes, gastosPorIntegrante, gastoTotalGrupo }
 }
 
-const validaPermiso = async (idUser, idGrupo) => {
+const validarPermiso = async (idUser, idGrupo) => {
     return await Grupo.findOne({
         where: { id: idGrupo, creador: idUser }
     })
 }
 
+const obtenerListadoGastosGrupo = async (idGrupo) => {
+    const listadoGastos = await gastosService.obtenerGastosGrupo(idGrupo)
 
-module.exports = { getGrupos, getDetalleGrupo, validaPermiso }
+    return listadoGastos
+}
+
+
+module.exports = { getGrupos, getDetalleGrupo, validarPermiso, obtenerListadoGastosGrupo }

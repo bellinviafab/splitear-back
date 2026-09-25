@@ -9,10 +9,12 @@ User.belongsToMany(Grupo, { through: Pertenencia, foreignKey: 'integranteId' }) 
 Grupo.belongsToMany(User, { through: Pertenencia, foreignKey: 'grupoId' })  //M:N Grupo--Contiene--Usuario
 Grupo.hasMany(Gasto, { as: 'gastoRealizado', foreignKey: 'idGrupo' })
 User.hasMany(Gasto, { as: 'creadorGasto', foreignKey: 'idCreadorGasto' })
+Gasto.belongsTo(User, { foreignKey: 'idCreadorGasto', as: 'creador' })
 User.belongsToMany(Gasto, { through: Detalle_gasto, foreignKey: 'idParticipante', otherKey: 'idGasto', as: 'gastos' })
 Gasto.belongsToMany(User, { through: Detalle_gasto, foreignKey: 'idGasto', otherKey: 'idParticipante', as: 'participantes' })
 Detalle_gasto.belongsTo(Gasto, { as: 'gasto', foreignKey: 'idGasto' });
 Detalle_gasto.belongsTo(User, { as: 'participante', foreignKey: 'idParticipante' })  //Permite consultas directas
 Gasto.hasMany(Detalle_gasto, { foreignKey: 'idGasto' })
+
 
 module.exports = { Grupo, User, Gasto, Detalle_gasto };

@@ -15,7 +15,7 @@ const crearGasto = async (req, res) => {
         const grupo = await Grupo.findByPk(idGrupo)
         if (!grupo)
             return res.status(404).json({ mensaje: "Grupo no encontrado" })
-        if (!monto)
+        if (!monto || monto <= 0)
             return res.status(400).json({ mensaje: "Monto invalido y/o inexistente" })
         const userParticipante = await Pertenencia.findOne({
             where: {
@@ -40,7 +40,7 @@ const crearGasto = async (req, res) => {
         const nuevoGasto = await gastoService.procesarYCrearGasto(grupo.id, arrayParticipantes, monto, user.id, descripcion)
         return res.status(201).json(nuevoGasto);
     } catch (error) {
-        return res.status(500).json(error);
+        return res.status(500).json({ mensaje: "Hubo un error al crear el Gasto" });
     }
 }
 
@@ -77,7 +77,7 @@ const eliminarGasto = async (req, res) => {
             throw error;
         }
     } catch (error) {
-        return res.status(500).json(error);
+        return res.status(500).json({ mensaje: "Hubo un error al eliminar el gasto" });
     }
 
 }
@@ -87,7 +87,7 @@ const liquidarDeuda = async (req, res) => {
         const obtieneLiquidacion = await gastoService.obtenerLiquidacion(req.params.id)  //Se va con el idGrupo
         return res.status(200).json(obtieneLiquidacion);
     } catch (error) {
-        return res.status(500).json(error);
+        return res.status(500).json({ mensaje: "Hubo un error al liquidar la deuda, intente nuevamente" });
     }
 }
 

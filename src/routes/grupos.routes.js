@@ -10,6 +10,7 @@ router.delete('/:id', authMiddleware.validateCookie, authMiddleware.validaPermis
 router.delete('/:id/miembros/:userId', authMiddleware.validateCookie, authMiddleware.validaPermiso, grupoController.eliminarMiembro);
 router.get('/', authMiddleware.validateCookie, grupoController.getGrupos)
 router.get('/:id', authMiddleware.validateCookie, authMiddleware.validaPertenencia, grupoController.detalleGrupo);
+router.get('/:id/gastos', authMiddleware.validateCookie, authMiddleware.validaPertenencia, grupoController.listadoGastosGrupo)
 
 
 module.exports = router;
