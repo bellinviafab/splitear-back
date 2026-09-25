@@ -16,7 +16,7 @@ const getGrupos = async (idUser) => {
     return listaGrupos
 }
 
-const getGrupo = async (idGrupo) => {
+const getGrupo = async (idGrupo) => {  //Utilizado para detalleGrupo
     return await Grupo.findByPk(idGrupo, {
         attributes: ['id', 'nombreGrupo', 'fechaFin', 'image']
     })
@@ -47,4 +47,11 @@ const getDetalleGrupo = async (idGrupo) => {
     return { grupo, integrantes, gastosPorIntegrante, gastoTotalGrupo }
 }
 
-module.exports = { getGrupos, getDetalleGrupo }
+const validaPermiso = async (idUser, idGrupo) => {
+    return await Grupo.findOne({
+        where: { id: idGrupo, creador: idUser }
+    })
+}
+
+
+module.exports = { getGrupos, getDetalleGrupo, validaPermiso }

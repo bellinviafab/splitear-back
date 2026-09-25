@@ -4,8 +4,8 @@ const authMiddleware = require("../middlewares/auth.middlewares.js")
 const gastosController = require("../controllers/gastos.controller.js");
 
 router.post('/:id', authMiddleware.validateCookie, gastosController.crearGasto);
-router.delete('/:id/:idGasto', authMiddleware.validateCookie, gastosController.eliminarGasto);
-router.post('/grupos/:id/balance', authMiddleware.validateCookie, gastosController.liquidarDeuda)
+router.delete('/:id/:idGasto', authMiddleware.validateCookie, authMiddleware.validaPertenencia, gastosController.eliminarGasto);
+router.get('/grupos/:id/balance', authMiddleware.validateCookie, authMiddleware.validaPertenencia, gastosController.liquidarDeuda)
 
 
 

@@ -76,6 +76,7 @@ const obtenerLiquidacion = async (idGrupo) => {  //Recorrer arreglos con find de
 
         return listadoDeudas;
     } catch (error) {
+        console.error(error)
         throw error;
     }
 
