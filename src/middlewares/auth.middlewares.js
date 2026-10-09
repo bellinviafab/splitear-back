@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken")
 const authService = require("../services/auths.service")
 const grupoService = require("../services/grupos.service")
 
+
 const validateCookie = (req, res, next) => {
     try {
         const token = req.cookies.token;

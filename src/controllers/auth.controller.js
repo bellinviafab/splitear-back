@@ -3,17 +3,14 @@ const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 const { Op } = require("sequelize")
 
-const crearUsuario = async (req, res) => {
+const crearUsuario = async (req, res, next) => {
     try {
-        const newUser = await User.create(req.body);
-        const { password, salt, ...usuarioPublico } = newUser.toJSON();
-        console.log(usuarioPublico)
+        const { email, username, password } = req.body
+        const newUser = await User.create({ email, username, password })
+        const { password: _password, salt, ...usuarioPublico } = newUser.toJSON();
         res.status(201).json(usuarioPublico);
     } catch (error) {
-        res.status(400).json({
-            error: error.name,
-            message: error.message
-        })
+        next(error);
     }
 }
 

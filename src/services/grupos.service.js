@@ -49,7 +49,7 @@ const getDetalleGrupo = async (idGrupo) => {
 
 const validarPermiso = async (idUser, idGrupo) => {
     return await Grupo.findOne({
-        where: { id: idGrupo, creador: idUser }
+        where: { id: idGrupo, creadorId: idUser }
     })
 }
 

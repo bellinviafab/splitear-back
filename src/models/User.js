@@ -34,11 +34,11 @@ User.init({
     },
     name: {
         type: S.STRING,
-        allowNull: false
+        allowNull: true
     },
     last_name: {
         type: S.STRING,
-        allowNull: false
+        allowNull: true
     },
     alias: {
         type: S.STRING

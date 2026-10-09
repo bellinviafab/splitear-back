@@ -44,7 +44,7 @@ const obtenerLiquidacion = async (idGrupo) => {  //Recorrer arreglos con find de
         if (!grupo) {
             const error = new Error("Grupo inexistente")
             error.status = 404
-            return error;       //Validar
+            throw error;
         }
         const listaParticipantes = await Pertenencia.findAll({  //Se debe comenzar con un findAll ya que puede haber participantes que nunca aportaron y son deudores totales
             where: {
