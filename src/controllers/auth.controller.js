@@ -14,7 +14,7 @@ const crearUsuario = async (req, res, next) => {
     }
 }
 
-const loginUsuario = async (req, res) => {
+const loginUsuario = async (req, res, next) => {
     try {
         const { identificador, password } = req.body;
 
@@ -25,11 +25,11 @@ const loginUsuario = async (req, res) => {
                 ],
             },
         })
-        if (!user)  //Salida -> "Usuario y/o contraseña incorrecto"
-            return res.status(401).json({ error: "Credenciales inválidas" });
-        const validar = await user.validarPassword(password);
-        if (!validar)   //salida -> "Usuario y/o contraseña incorrectos"
-            return res.status(401).json({ error: "Credenciales inválidas" })
+
+        if (!user || !(await user.validarPassword(password))) {
+            return res.status(401).json({ message: "Credenciales invalidas" })
+        }
+
         const payload = {  //Payload para el jwt
             id: user.id,
             username: user.username
@@ -52,10 +52,7 @@ const loginUsuario = async (req, res) => {
         });
 
     } catch (error) {
-        return res.status(500).json({
-            error: error.name,
-            message: error.message,
-        });
+        next(error);
     }
 }
 

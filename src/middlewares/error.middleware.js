@@ -8,6 +8,10 @@ const errorHandler = (error, req, res, next) => {
         return res.status(400).json({ message: "Revisa los datos ingresados" })
     }
 
+    if (error.statusCode) {
+        return res.status(error.statusCode).json({ message: error.message });
+    }
+
     console.error(error)
     return res.status(500).json({ message: "Ocurrió un error inesperado" });
 }
