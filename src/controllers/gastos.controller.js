@@ -7,7 +7,7 @@ const { Op } = require("sequelize")
 const gastoService = require("../services/gastos.service")
 const s = require('../db.js')
 
-const crearGasto = async (req, res) => {
+const crearGasto = async (req, res) => {    //Desacoplar con services
     try {
         const user = req.user;
         const idGrupo = req.params.id;

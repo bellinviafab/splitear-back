@@ -2,7 +2,7 @@ const Grupo = require("../models/Grupo")
 const User = require("../models/User")
 const gastosService = require("./gastos.service")
 
-const getGrupos = async (idUser) => {
+const getGrupos = async (idUser) => { //Debe devolver grupos y el saldo neto por integrante por grupo
     const listaGrupos = await Grupo.findAll({
         attributes: ['id', 'nombreGrupo', 'fechaFin', 'image'],
 
@@ -13,7 +13,22 @@ const getGrupos = async (idUser) => {
             through: { attributes: [] } // Evita que el JSON traiga el objeto Pertenencia
         }]
     })
-    return listaGrupos
+
+    const gruposConSaldo = [] //Inicializo arreglo vacio
+
+    for (const grupoInstancia of listaGrupos) //Obtener el saldo neto del participante por grupo
+    {
+        const grupo = grupoInstancia.toJSON();
+
+        const gastado = await gastosService.obtenerTotalGastadoUsuario(grupo.id, idUser)
+        const consumido = await gastosService.obtenerTotalConsumidoUsuario(grupo.id, idUser)
+
+        grupo.saldoNeto = gastado - consumido
+
+        gruposConSaldo.push(grupo);
+    }
+
+    return gruposConSaldo
 }
 
 const getGrupo = async (idGrupo) => {  //Utilizado para detalleGrupo

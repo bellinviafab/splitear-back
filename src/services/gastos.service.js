@@ -151,6 +151,7 @@ async function obtenerListaSaldoNeto(listaParticipantes, gastoTotalIntegrante, p
 }
 
 async function obtenerGastosGrupo(idGrupo) {
+
     return await Gasto.findAll({
         attributes: ['id', 'monto', 'descripcion', 'idCreadorGasto', 'createdAt'],
         where: { idGrupo: idGrupo },
@@ -164,6 +165,45 @@ async function obtenerGastosGrupo(idGrupo) {
         ],
         order: [['createdAt', 'DESC']]
     });
+}
+
+const obtenerTotalGastadoUsuario = async (idGrupo, idUser) => {
+    const resultado = await Gasto.findOne({
+        attributes: [
+            [sequelize.fn('SUM', sequelize.col('monto')), 'montoTotalErogado']
+        ],
+
+
+        where: { idGrupo: idGrupo, idCreadorGasto: idUser },
+
+        raw: true
+    })
+
+    return Number(resultado?.montoTotalErogado) || 0 //Si no gastó nada, MontoTotalErogado Termina siendo null y devuleve 0
+}
+
+const obtenerTotalConsumidoUsuario = async (idGrupo, idUser) => {
+    const resultado = await Detalle_gasto.findOne({
+        attributes: [
+            [sequelize.fn('SUM', sequelize.col('detalle_gasto.monto')), 'totalConsumido']
+        ],
+
+        include: [  //Inner Join
+            {
+                model: Gasto,
+                as: 'gasto',
+                where: { idGrupo: idGrupo },    //Solo toma los gastos con el idGrupo
+
+                attributes: [], //No arrastra ninguna columna
+            },
+        ],
+
+        where: { idParticipante: idUser },
+
+        raw: true
+    })
+
+    return Number(resultado?.totalConsumido) || 0
 }
 
 /*const getGastosGrupo = async (idGrupo) => {
@@ -187,7 +227,7 @@ async function obtenerGastosGrupo(idGrupo) {
 
 
 
-module.exports = { procesarYCrearGasto, obtenerLiquidacion, obtenerGastoTotalIntegrante, obtenerGastosGrupo };
+module.exports = { procesarYCrearGasto, obtenerLiquidacion, obtenerGastoTotalIntegrante, obtenerGastosGrupo, obtenerTotalGastadoUsuario, obtenerTotalConsumidoUsuario };
 
 
 
