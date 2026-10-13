@@ -66,5 +66,20 @@ const logoutUsuario = (req, res) => {
     return res.sendStatus(204);
 }
 
-module.exports = { crearUsuario, loginUsuario, logoutUsuario }
+const obtenerUsuarioActual = async (req, res, next) => {
+    try {
+        const user = await User.findByPk(req.user.id, {
+            attributes: {
+                exclude: ['password', 'salt']
+            }
+        })
+        if (!user)
+            return res.status(401).json({ message: "Sesión caducada" });
+        return res.json(user)
+    } catch (error) {
+        next(error);
+    }
+}
+
+module.exports = { crearUsuario, loginUsuario, logoutUsuario, obtenerUsuarioActual }
 

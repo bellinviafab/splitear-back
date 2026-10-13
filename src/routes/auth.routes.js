@@ -12,5 +12,6 @@ const authMiddleware = require('../middlewares/auth.middlewares')
 router.post('/register', authController.crearUsuario);
 router.post('/login', authController.loginUsuario);
 router.post('/logout', authController.logoutUsuario);
+router.get('/me', authMiddleware.validateCookie, authController.obtenerUsuarioActual);
 
 module.exports = router;
