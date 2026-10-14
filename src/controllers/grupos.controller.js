@@ -141,4 +141,14 @@ const listadoGastosGrupo = async (req, res) => {
     }
 }
 
-module.exports = { crearGrupo, eliminarGrupo, agregarMiembro, eliminarMiembro, getGrupos, detalleGrupo, listadoGastosGrupo };
+const listadoIntegrantesGrupo = async (req, res, next) => {
+    try {
+        const idGrupo = req.params.id
+        const integrantes = await grupoService.obtenerListadoIntegrantes(idGrupo)
+        return res.status(200).json({ integrantes })
+    } catch (error) {
+        next(error);
+    }
+}
+
+module.exports = { crearGrupo, eliminarGrupo, agregarMiembro, eliminarMiembro, getGrupos, detalleGrupo, listadoGastosGrupo, listadoIntegrantesGrupo };

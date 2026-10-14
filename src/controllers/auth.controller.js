@@ -47,8 +47,9 @@ const loginUsuario = async (req, res, next) => {
                 id: user.id,
                 username: user.username,
                 email: user.email,
+                name: user.name || null,
+                last_name: user.last_name || null,
             },
-            token,
         });
 
     } catch (error) {

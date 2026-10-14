@@ -43,10 +43,10 @@ User.init({
     alias: {
         type: S.STRING
     },
-    image: {
+    /*image: {
         type: S.STRING,
         allowNull: true
-    },
+    },*/
 }, { sequelize: db, modelName: "user", })  //Implementar defualtScope y specialScope
 
 User.beforeCreate(async (user) => {  //beforeCreate es un hook a nivel capa de aplicación o trigger a nivel bd

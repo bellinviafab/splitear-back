@@ -74,5 +74,20 @@ const obtenerListadoGastosGrupo = async (idGrupo) => {
     return listadoGastos
 }
 
+const obtenerListadoIntegrantes = async (idGrupo) => {
+    const listado = await User.findAll({
+        attributes: ['id', 'name', 'last_name', 'alias'],
 
-module.exports = { getGrupos, getDetalleGrupo, validarPermiso, obtenerListadoGastosGrupo }
+        include: [{
+            model: Grupo,
+            where: { id: idGrupo },
+            attributes: [],
+            through: { attributes: [] }
+        }]
+
+    })
+    return listado
+}
+
+
+module.exports = { getGrupos, getDetalleGrupo, validarPermiso, obtenerListadoGastosGrupo, obtenerListadoIntegrantes }
