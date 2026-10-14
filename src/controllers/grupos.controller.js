@@ -5,19 +5,21 @@ const s = require('../db.js')
 const grupoService = require("../services/grupos.service.js")
 
 
-const crearGrupo = async (req, res) => {
+const crearGrupo = async (req, res, next) => {
     const t = await s.transaction();
     try {
-        const { nombreGrupo } = req.body;  //Extrae el nombre del grupo y el usuario del body
+        const { nombreGrupo, descripcion, fechaFin } = req.body;  //Extrae el nombre del grupo y el usuario del body
         const user = req.user;
         const grupo = await Grupo.findOne({ where: { nombreGrupo: nombreGrupo, creadorId: user.id }, transaction: t })  //Verifica que no exista en bd para ese usuario
         if (grupo) {
             await t.rollback(); //Cancelo la transaccion y libero la bd.
-            return res.sendStatus(400); //Invalido por existencia del grupo con ese nombre en la cuenta de ese usuario
+            return res.status(400).json({ message: "El grupo con ese nombre ya existe" }); //Invalido por existencia del grupo con ese nombre en la cuenta de ese usuario
         }
         const newGrupo = await Grupo.create({
             nombreGrupo: nombreGrupo,
-            creadorId: user.id   //fechaFin Opcional
+            descripcion: descripcion || null,
+            fechaFin: fechaFin || null,
+            creadorId: user.id
         }, { transaction: t });
 
         const { integrantes = [] } = req.body;
@@ -33,12 +35,12 @@ const crearGrupo = async (req, res) => {
 
         arrayIntegrantes.push(user.id);
         await newGrupo.addUsers(arrayIntegrantes, { transaction: t });
-
+        console.log(`Grupo creado con exito: ${newGrupo.nombreGrupo} por el usuario: ${user.username}`);
         await t.commit();
         return res.status(201).json(newGrupo);
     } catch (error) {
         await t.rollback();
-        return res.sendStatus(500);
+        next(error);
     }
 
 }
@@ -47,17 +49,17 @@ async function enviarMail() { //Puertos diferentes
     //Invitacion por mail
 }
 
-const eliminarGrupo = async (req, res) => {  //Soft delete
+const eliminarGrupo = async (req, res, next) => {  //Soft delete
     try {
         const idUser = req.user.id;
         const idGrupo = req.params.id;
         const grupo = await Grupo.findOne({ where: { id: idGrupo, creadorId: idUser } }) //Busqueda por id y por fk al creador
         if (!grupo)
-            return res.sendStatus(404); //Grupo no encontrado
+            return res.status(404).json({ message: "Grupo no encontrado" }); //Grupo no encontrado
         await grupo.destroy();
-        return res.status(200).json({ mensaje: "Grupo eliminado exitosamente" }); //Grupo soft-deleted
+        return res.status(200).json({ message: "Grupo eliminado exitosamente" }); //Grupo soft-deleted
     } catch (error) {
-        return res.sendStatus(500);
+        next(error);
     }
 
 }
@@ -121,7 +123,7 @@ const detalleGrupo = async (req, res) => {
     try {
         const detalleGrupo = await grupoService.getDetalleGrupo(req.params.id)
         if (!detalleGrupo) {
-            return res.status(404).json({ error: "El grupo solicitado no existe" });
+            return res.status(404).json({ message: "El grupo solicitado no existe" });
         }
         return res.status(200).json(detalleGrupo)
     } catch (error) {

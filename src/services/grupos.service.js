@@ -4,7 +4,7 @@ const gastosService = require("./gastos.service")
 
 const getGrupos = async (idUser) => { //Debe devolver grupos y el saldo neto por integrante por grupo
     const listaGrupos = await Grupo.findAll({
-        attributes: ['id', 'nombreGrupo', 'fechaFin', 'image'],
+        attributes: ['id', 'nombreGrupo', 'fechaFin'],
 
         include: [{
             model: User,    //Como User tiene belongsToMany through pertenencia, se debe llamar al modelo final.
@@ -33,7 +33,7 @@ const getGrupos = async (idUser) => { //Debe devolver grupos y el saldo neto por
 
 const getGrupo = async (idGrupo) => {  //Utilizado para detalleGrupo
     return await Grupo.findByPk(idGrupo, {
-        attributes: ['id', 'nombreGrupo', 'fechaFin', 'image']
+        attributes: ['id', 'nombreGrupo', 'descripcion', 'fechaFin']
     })
 }
 
@@ -43,7 +43,7 @@ const getDetalleGrupo = async (idGrupo) => {
         return null
 
     const integrantes = await User.findAll({
-        attributes: ['id', 'name', 'last_name', 'alias', 'image'],
+        attributes: ['id', 'name', 'last_name', 'alias'],
 
         include: [{
             model: Grupo,
