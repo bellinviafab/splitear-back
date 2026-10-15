@@ -49,6 +49,7 @@ const loginUsuario = async (req, res, next) => {
                 email: user.email,
                 name: user.name || null,
                 last_name: user.last_name || null,
+                alias: user.alias || null
             },
         });
 

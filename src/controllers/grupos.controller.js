@@ -64,28 +64,27 @@ const eliminarGrupo = async (req, res, next) => {  //Soft delete
 
 }
 
-const agregarMiembro = async (req, res) => {
+const agregarMiembro = async (req, res, next) => {
     try {
         const { integrante = {} } = req.body;
         const grupo = await Grupo.findOne({ where: { id: req.params.id, creadorId: req.user.id } })
         if (!grupo)
-            return res.status(404).json({ mensaje: "Grupo no encontrado y/o Usuario no autorizado" });
+            return res.status(404).json({ message: "Grupo no encontrado y/o Usuario no autorizado para añadir integrantes" });
 
         const newIntegrante = await User.findOne({ where: { email: integrante.email } })
 
         if (!newIntegrante) {
             enviarMail(integrante.email, grupo);
-            return res.status(200).json({ mensaje: "El usuario no posee cuenta, se ha enviado un email de invitación" })
+            return res.status(200).json({ message: "El usuario no posee cuenta, se ha enviado un email de invitación" })
         }
 
         if (await grupo.hasUser(newIntegrante))
-            return res.status(400).json({ mensaje: "Usuario ya forma parte del grupo" })
+            return res.status(409).json({ message: "Usuario ya forma parte del grupo" })
 
         await grupo.addUser(newIntegrante);
-        return res.status(200).json({ mensaje: "Usuario añadido con exito" })
+        return res.status(201).json({ message: "Usuario añadido con exito" })
     } catch (error) {
-        console.error(error);
-        return res.sendStatus(500);
+        next(error);
     }
 }
 
