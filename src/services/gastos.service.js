@@ -206,28 +206,43 @@ const obtenerTotalConsumidoUsuario = async (idGrupo, idUser) => {
     return Number(resultado?.totalConsumido) || 0
 }
 
-/*const getGastosGrupo = async (idGrupo) => {
-    return Grupo.findOne({
-        where: {
-            id: idGrupo
-        },
 
-        attributes: ['id', sequelize.fn('SUM', sequelize.col('grupo.monto')), 'totalGastado'],
+const obtenerGastosGrupos = async (listadoGrupos) => {
+    const idsGrupos = listadoGrupos.map((g) => g.id) //Me quedo solo con las ids
+    if (idsGrupos.length === 0) return [];
+    const gastosGrupos = await Gasto.findAll({
+        attributes: ["id", "monto", "descripcion", "idCreadorGasto", "idGrupo", "createdAt"],
 
-        group: [
-            'id'
+        where: { idGrupo: idsGrupos }, //Internamente sequelize genera un IN, no es necesario utilizar Op.in
+        limit: 30,
+        order: [
+            ["createdAt", "DESC"]   //Orden descendente para mostrar los ultimos gastos primero
+        ],
+        include: [
+            {
+                model: User,
+                as: 'creador',
+                attributes: ["id", "name", "last_name", "username"]
+            },
+            {
+                model: Grupo,
+                as: "grupo",
+                attributes: ["id", "nombreGrupo"]
+            },
+            {
+                model: Detalle_gasto,
+                attributes: ["idParticipante", "monto"],
+                separate: true,         //Genera dos consultas separadas y luego empareja cada detalle_gasto con su gasto usando la FK a gasto
+                as: 'detalle_gastos',
+                include: [{ model: User, as: 'participante', attributes: ["id", "name", "last_name", "username"] }]
+            }
         ]
-
     })
-}*/
+    return gastosGrupos;
+}
 
 
-
-
-
-
-
-module.exports = { procesarYCrearGasto, obtenerLiquidacion, obtenerGastoTotalIntegrante, obtenerGastosGrupo, obtenerTotalGastadoUsuario, obtenerTotalConsumidoUsuario };
+module.exports = { procesarYCrearGasto, obtenerLiquidacion, obtenerGastoTotalIntegrante, obtenerGastosGrupo, obtenerTotalGastadoUsuario, obtenerTotalConsumidoUsuario, obtenerGastosGrupos };
 
 
 

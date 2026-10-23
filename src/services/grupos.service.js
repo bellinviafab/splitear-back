@@ -3,16 +3,7 @@ const User = require("../models/User")
 const gastosService = require("./gastos.service")
 
 const getGrupos = async (idUser) => { //Debe devolver grupos y el saldo neto por integrante por grupo
-    const listaGrupos = await Grupo.findAll({
-        attributes: ['id', 'nombreGrupo', 'fechaFin'],
-
-        include: [{
-            model: User,    //Como User tiene belongsToMany through pertenencia, se debe llamar al modelo final.
-            where: { id: idUser },
-            attributes: [],
-            through: { attributes: [] } // Evita que el JSON traiga el objeto Pertenencia
-        }]
-    })
+    const listaGrupos = await listadoGruposUsuario(idUser);
 
     const gruposConSaldo = [] //Inicializo arreglo vacio
 
@@ -29,6 +20,19 @@ const getGrupos = async (idUser) => { //Debe devolver grupos y el saldo neto por
     }
 
     return gruposConSaldo
+}
+
+const listadoGruposUsuario = async (idUser) => {   //Reutilización para evitar repetición de codigo
+    return await Grupo.findAll({
+        attributes: ['id', 'nombreGrupo', 'fechaFin'],
+
+        include: [{
+            model: User,    //Como User tiene belongsToMany through pertenencia, se debe llamar al modelo final.
+            where: { id: idUser },
+            attributes: [],
+            through: { attributes: [] } // Evita que el JSON traiga el objeto Pertenencia
+        }]
+    })
 }
 
 const getGrupo = async (idGrupo) => {  //Utilizado para detalleGrupo
@@ -90,4 +94,4 @@ const obtenerListadoIntegrantes = async (idGrupo) => {
 }
 
 
-module.exports = { getGrupos, getDetalleGrupo, validarPermiso, obtenerListadoGastosGrupo, obtenerListadoIntegrantes }
+module.exports = { getGrupos, getDetalleGrupo, validarPermiso, obtenerListadoGastosGrupo, obtenerListadoIntegrantes, listadoGruposUsuario }

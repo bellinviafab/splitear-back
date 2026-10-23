@@ -3,7 +3,7 @@ const Pertenencia = require("../models/Pertenencia.js");
 const User = require("../models/User.js");
 const s = require('../db.js')
 const grupoService = require("../services/grupos.service.js")
-
+const gastosService = require("../services/gastos.service.js")
 
 const crearGrupo = async (req, res, next) => {
     const t = await s.transaction();
@@ -150,4 +150,24 @@ const listadoIntegrantesGrupo = async (req, res, next) => {
     }
 }
 
-module.exports = { crearGrupo, eliminarGrupo, agregarMiembro, eliminarMiembro, getGrupos, detalleGrupo, listadoGastosGrupo, listadoIntegrantesGrupo };
+const listadoActividadGrupos = async (req, res, next) => { //Retorna la actividad de los grupos a los que pertenece un usuario, perteneciente a Actividad en el front
+    try {
+        const listadoGrupos = await grupoService.listadoGruposUsuario(req.user.id)
+        const gastosGrupos = await gastosService.obtenerGastosGrupos(listadoGrupos)
+        return res.status(200).json({ gastosGrupos })
+    } catch (error) {
+        next(error);
+    }
+}
+
+module.exports = {
+    crearGrupo,
+    eliminarGrupo,
+    agregarMiembro,
+    eliminarMiembro,
+    getGrupos,
+    detalleGrupo,
+    listadoGastosGrupo,
+    listadoIntegrantesGrupo,
+    listadoActividadGrupos
+};
